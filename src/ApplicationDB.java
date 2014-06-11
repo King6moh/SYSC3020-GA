@@ -11,9 +11,7 @@ import java.util.*;
  * @author Team 4
  *
  */
-public class ApplicationDB {
-
-	
+public class ApplicationDB {	
 	
 	public static ArrayList<Object> getApplicationbyID(int ID) throws FileNotFoundException, IOException {
 		if (ID >= readFromFile())
@@ -23,14 +21,72 @@ public class ApplicationDB {
 		}
 	}
 
-	public ArrayList<Application> getApplicationbyFieldOfStudy(FieldOfStudy fos) {
-		return null;
-	}
-	
-	public ArrayList<ArrayList> getApplicationbyTerm(Term term) throws IOException {
+	public static ArrayList<ArrayList> getApplicationbyFieldOfStudy(FieldOfStudy fos) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Applications.txt")));
 		String line;
-		String termLocal;
+		String fosLocal = null;
+		String appID;
+		int ID;
+		ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
+		
+		while ((line = br.readLine()) != null) {
+			int dollarSignCount = 0;
+			   for(int i = 0; i < line.length(); i++) {
+				   if (line.charAt(i) == '$') {
+					   dollarSignCount++;
+				   }
+				   if (dollarSignCount == 5) {
+					   int index = i+1;
+					   for(int k = index; k < line.length(); k++) {
+						   if (line.charAt(k) == '$') {
+							   fosLocal = line.substring(index, k);
+							   System.out.println("termLocal: " + fosLocal);
+							   index = k+1;
+							   break;
+						   }
+					   }
+					}
+				   if (fos.toString().equals(fosLocal) == false && dollarSignCount == 5) {
+					   System.out.println(dollarSignCount);
+					   System.out.println(fos.toString());
+					   System.out.println(fosLocal);
+					   System.out.println("break line 56");
+					   break;
+				   }
+				   if(fos.toString().equals(fosLocal) && dollarSignCount == 5) {
+					   System.out.println("line 63");
+					   for(int j = 0; j < line.length(); j++) {
+						   ID = 0;
+						   if (line.charAt(j) == '$') {
+							   appID = line.substring(0, j);
+							   int offset = 1;
+							   for(int k = 0; k < appID.length()-1; k++) {
+								   offset = offset*10;
+							   }
+							   for(int k = 0; k < appID.length(); k++) {
+								   ID = ID + ((appID.charAt(k)-48)*offset);
+							   }
+							   System.out.println(ID);
+							   arr.add(getApplicationbyID(ID));
+							   System.out.println("line 77 break");
+							   break;
+						   }
+					   }
+					   System.out.println("Line 81 break");
+					   break;
+				   }
+			   }
+		}
+		return arr;
+	}
+	
+	public static ArrayList<ArrayList> getApplicationbyTerm(Term term) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Applications.txt")));
+		String line;
+		String termLocal = null;
+		String appID;
+		int ID;
+		ArrayList<ArrayList> arr = new ArrayList<ArrayList>();
 		
 		while ((line = br.readLine()) != null) {
 			int dollarSignCount = 0;
@@ -43,13 +99,44 @@ public class ApplicationDB {
 					   for(int k = index; k < line.length(); k++) {
 						   if (line.charAt(k) == '$') {
 							   termLocal = line.substring(index, k);
+							   System.out.println("termLocal: " + termLocal);
 							   index = k+1;
 							   break;
 						   }
 					   }
+					}
+				   if (term.toString().equals(termLocal) == false && dollarSignCount == 4) {
+					   System.out.println(dollarSignCount);
+					   System.out.println(term.toString());
+					   System.out.println(termLocal);
+					   System.out.println("break line 56");
+					   break;
+				   }
+				   if(term.toString().equals(termLocal) && dollarSignCount == 4) {
+					   System.out.println("line 63");
+					   for(int j = 0; j < line.length(); j++) {
+						   ID = 0;
+						   if (line.charAt(j) == '$') {
+							   appID = line.substring(0, j);
+							   int offset = 1;
+							   for(int k = 0; k < appID.length()-1; k++) {
+								   offset = offset*10;
+							   }
+							   for(int k = 0; k < appID.length(); k++) {
+								   ID = ID + ((appID.charAt(k)-48)*offset);
+							   }
+							   System.out.println(ID);
+							   arr.add(getApplicationbyID(ID));
+							   System.out.println("line 77 break");
+							   break;
+						   }
+					   }
+					   System.out.println("Line 81 break");
+					   break;
 				   }
 			   }
 		}
+		return arr;
 		
 	}
 	
@@ -164,9 +251,9 @@ public class ApplicationDB {
 		return null;
 	}
 	public static void main(String [] args) {
-		ArrayList<Object> array = new ArrayList<Object>();
+		ArrayList<ArrayList> array = new ArrayList<ArrayList>();
 		try {
-			array = getApplicationbyID(124);
+			array = getApplicationbyFieldOfStudy(FieldOfStudy.ENGINEERING);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -174,12 +261,6 @@ public class ApplicationDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(array.get(0));
-		System.out.println(array.get(1));
-		System.out.println(array.get(2));
-		System.out.println(array.get(3));
-		System.out.println(array.get(4));
-		System.out.println(array.get(5));
-		System.out.println(array.get(6));
+		System.out.print(array);
 	}
 }
