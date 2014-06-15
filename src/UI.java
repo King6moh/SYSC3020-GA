@@ -13,17 +13,8 @@ import javax.swing.*;
  *
  */
 public class UI {
-	private static JFrame frameCC;
-	private static JButton login;
-	private static JButton exit;
-	private static JTextArea username;
-	private static JTextArea password;
-	private static String user;
-	private static String pass;
 	private static String usertype;
-	private static boolean authenticated;
-	private static int count = 0;
-
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -32,7 +23,7 @@ public class UI {
     //all it's components
     private static void createLoginFrame() throws IOException
     {
-        
+        int count = 0;
         JFrame guiFrame = new JFrame();
         
       //This will center the JFrame in the middle of the screen
@@ -55,13 +46,20 @@ public class UI {
         //As the JOptionPane accepts an object as the message
         //it allows us to use any component we like - in this case 
         //a JPanel containing the dialog components we want
-        JOptionPane.showConfirmDialog(guiFrame, userPanel, "Enter your password:"
+        int input = JOptionPane.showConfirmDialog(guiFrame, userPanel, "Enter your password:"
                             ,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
-        pass = new String(passwordFld.getPassword());
-        user = username.getText();
+        if (input != 0) {
+        	System.out.println("User has hit cancel");
+        	guiFrame.dispose();
+        	createCCFrame();
+        	return;
+        }
         
-        authenticated = authenticate(user, pass);
+        String pass = new String(passwordFld.getPassword());
+        String user = username.getText();
+        
+        boolean authenticated = authenticate(user, pass);
         
         System.out.println(user);
         System.out.println(pass);
@@ -71,7 +69,7 @@ public class UI {
         	System.out.println("The user is a(n): " + usertype);
             guiFrame.dispose();
             
-            createUserFrame();
+            createUserFrame(user);
         }
         else {
         	count++;
@@ -89,8 +87,57 @@ public class UI {
         }
     }
     
-    private static void createUserFrame() throws FileNotFoundException, IOException {
-    	JFrame guiFrame = new JFrame();
+    private static void createApplicationFrame() {
+    	JFrame appFrame = new JFrame("Fill out your new application");
+    	
+		JPanel userPanel = new JPanel();
+        userPanel.setLayout(new GridLayout(3,2));
+        
+        //This will center the JFrame in the middle of the screen
+		appFrame.setLocationRelativeTo(null);
+		appFrame.setVisible(true);
+		
+        JLabel termLabel = new JLabel("Select Term.");
+        JLabel fosLabel = new JLabel("Select Field Of Study.");
+        JLabel fundingLabel = new JLabel("Do you require Funding?");
+        
+        String[] terms = { Term.FALL.toString(), Term.WINTER.toString(), Term.SUMMER.toString() };
+        JComboBox termList = new JComboBox(terms);
+        termList.addActionListener(termList);
+        
+        String[] fields = { FieldOfStudy.ARTS.toString(), FieldOfStudy.COMMERCE.toString(), FieldOfStudy.ENGINEERING.toString(), FieldOfStudy.SCIENCE.toString() };
+        JComboBox fieldList = new JComboBox(fields);
+        fieldList.addActionListener(fieldList);
+        
+        String[] fundings = { "Yes", "No" };
+        JComboBox fundingList = new JComboBox(fundings);
+        fundingList.addActionListener(fundingList);
+        
+        userPanel.add(termLabel);
+        userPanel.add(termList);
+        userPanel.add(fosLabel);
+        userPanel.add(fieldList);
+        userPanel.add(fundingLabel);
+        userPanel.add(fundingList);
+        
+        int input = JOptionPane.showConfirmDialog(appFrame, userPanel, "Fill out your application"
+                ,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (input == 0) {
+        	String termSel = (String)termList.getSelectedItem();
+        	String fieldSel = (String)fieldList.getSelectedItem();
+        	String fundingSel = (String)fundingList.getSelectedItem();
+        	
+        	System.out.println(termSel);
+        	System.out.println(fieldSel);
+        	System.out.println(fundingSel);
+        }
+        appFrame.dispose();
+        
+    }
+    
+    private static void createUserFrame(String user) throws FileNotFoundException, IOException {
+    	final JFrame guiFrame = new JFrame();
     	JButton newApp = new JButton("New Application");
     	JButton viewApp = new JButton("View Current Application");
     	JButton editApp = new JButton("Edit Application");
@@ -115,6 +162,17 @@ public class UI {
     		//This will center the JFrame in the middle of the screen
     		guiFrame.setLocationRelativeTo(null);
     		guiFrame.setVisible(true);
+    		submitApp.setEnabled(false);
+    		viewApp.setEnabled(false);
+    		editApp.setEnabled(false);
+    		newApp.addActionListener(new ActionListener() {
+    			
+    			public void actionPerformed(ActionEvent e) {
+    				guiFrame.dispose();
+    				createApplicationFrame();
+    			}
+    		});
+    		
     	}
     	else {
     		Container pane = guiFrame.getContentPane();
@@ -171,10 +229,10 @@ public class UI {
     	return false;
     }
 
-	public static void main(String[] args) {
-		frameCC = new JFrame("Hello, welcome to Carleton Central");
-		login = new JButton("Login");
-		exit = new JButton("Exit");
+    private static void createCCFrame() {
+    	final JFrame frameCC = new JFrame("Hello, welcome to Carleton Central");
+		JButton login = new JButton("Login");
+		JButton exit = new JButton("Exit");
 
 		//This will center the JFrame in the middle of the screen
 		frameCC.setLocationRelativeTo(null);
@@ -208,6 +266,10 @@ public class UI {
 		frameCC.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frameCC.setSize(300, 200);
 		frameCC.setVisible(true);
+    }
+    
+	public static void main(String[] args) {
+		createCCFrame();
 	}
 
 }
