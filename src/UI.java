@@ -1,5 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.*;
 
@@ -15,13 +19,15 @@ public class UI {
 	private static JTextArea password;
 	private static String user;
 	private static char[] pass;
+	private static String usertype;
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
 	//handles the creation of the JFrame and
     //all it's components
-    private static void createLoginFrame()
+    private static void createLoginFrame() throws IOException
     {
         
         JFrame guiFrame = new JFrame();
@@ -48,10 +54,50 @@ public class UI {
         pass = passwordFld.getPassword();
         user = username.getText();
         
+        Authenticate(user, new String(pass));
+        
         System.out.println(user);
-        System.out.println(pass);
+        System.out.println(new String(pass));
+        System.out.println("The user is a(n): " + usertype);
         guiFrame.dispose();
     }
+
+    private static void Authenticate(String username, String password) throws IOException {
+    	BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Users.txt")));
+
+    	String line;
+    	String user = null;
+    	String pass = null;
+    	int index = 0;
+
+    	while ((line = br.readLine()) != null) {
+    		while(true) {
+    			for(int i = 0; i < line.length(); i++) {
+    				if(line.charAt(i) == '$') {
+    					user = line.substring(0, i);
+    					index = i+1;
+    					break;
+    				}
+    			}
+    			if(!user.equals(username))
+    				break;
+    			for(int i = index; i <line.length(); i++) {
+    				if(line.charAt(i) == '$') {
+    					pass = line.substring(index, i);
+    					index = i+1;
+    					break;
+    				}
+    			}
+    			if(!pass.equals(password))
+    				break;
+    			usertype = line.substring(index, line.length());
+    			System.out.println("The user has been authenticated");
+    			return;
+    		}
+    	}
+    	System.out.println("The user could not be authenticated");
+    }
+
 	public static void main(String[] args) {
 		frameCC = new JFrame("Hello, welcome to Carleton Central");
 		login = new JButton("Login");
@@ -61,7 +107,12 @@ public class UI {
 			
 			public void actionPerformed(ActionEvent e) {
 				frameCC.dispose();
-				createLoginFrame();
+				try {
+					createLoginFrame();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		
