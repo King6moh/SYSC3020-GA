@@ -286,6 +286,7 @@ public class ApplicationDB {
 	public static void main(String [] args) {
 		Application app = new Application("KaisHassanali", Term.FALL, FieldOfStudy.ENGINEERING, false);
 		app = new Application("SamsonTruong", Term.WINTER, FieldOfStudy.SCIENCE, true);
+		/* Check the Applications file in the Database, and you'll see which ones should be printed here */
 		ArrayList<ArrayList> array = new ArrayList<ArrayList>();
 		try {
 			array = getApplicationbyFieldOfStudy(FieldOfStudy.ENGINEERING);
