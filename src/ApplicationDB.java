@@ -113,6 +113,65 @@ public class ApplicationDB {
 		}
 		return arr;
 	}
+	
+	public static ArrayList<Object> getApplicationbyName(String name) throws FileNotFoundException, IOException {
+		BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Applications.txt")));
+		String line;
+		String nameLocal = null;
+		String appID;
+		int ID;
+		ArrayList<Object> arr = new ArrayList<Object>();
+		
+		while ((line = br.readLine()) != null) {
+			int dollarSignCount = 0;
+			   for(int i = 0; i < line.length(); i++) {
+				   if (line.charAt(i) == '$') {
+					   dollarSignCount++;
+				   }
+				   if (dollarSignCount == 3) { // we know the field we want is after the 5th dollar sign delimeter
+					   int index = i+1;
+					   for(int k = index; k < line.length(); k++) {
+						   if (line.charAt(k) == '$') {
+							   nameLocal = line.substring(index, k);
+							   index = k+1;
+							   break;
+						   }
+					   }
+					}
+				   if (name.equals(nameLocal) == false && dollarSignCount == 3) {
+					   //System.out.println(dollarSignCount);
+					   //System.out.println(fos.toString());
+					   //System.out.println(fosLocal);
+					  // System.out.println("break line 56");
+					   break;
+				   }
+				   if(name.equals(nameLocal) && dollarSignCount == 3) {
+					   //System.out.println("line 63");
+					   for(int j = 0; j < line.length(); j++) {
+						   ID = 0;
+						   if (line.charAt(j) == '$') {
+							   appID = line.substring(0, j);
+							   int offset = 1;
+							   for(int k = 0; k < appID.length()-1; k++) {
+								   offset = offset*10;
+							   }
+							   for(int k = 0; k < appID.length(); k++) {
+								   ID = ID + ((appID.charAt(k)-48)*offset);
+							   }
+							   System.out.println(ID);
+							   arr = getApplicationbyID(ID);
+							  // System.out.println("line 77 break");
+							   return arr;
+						   }
+					   }
+					   //System.out.println("Line 81 break");
+					   break;
+				   }
+			   }
+		}
+		return null;
+	}
+	
 	/**
 	 * THe following method will return an array of array lists that will contain all the application that match the term given
 	 * @param term the term we are searching for

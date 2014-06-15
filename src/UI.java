@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -18,8 +19,10 @@ public class UI {
 	private static JTextArea username;
 	private static JTextArea password;
 	private static String user;
-	private static char[] pass;
+	private static String pass;
 	private static String usertype;
+	private static boolean authenticated;
+	private static int count = 0;
 
 	/**
 	 * @param args
@@ -31,6 +34,10 @@ public class UI {
     {
         
         JFrame guiFrame = new JFrame();
+        
+      //This will center the JFrame in the middle of the screen
+        guiFrame.setLocationRelativeTo(null);
+        guiFrame.setVisible(true);
 
         JPanel userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(2,2));
@@ -51,18 +58,85 @@ public class UI {
         JOptionPane.showConfirmDialog(guiFrame, userPanel, "Enter your password:"
                             ,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
-        pass = passwordFld.getPassword();
+        pass = new String(passwordFld.getPassword());
         user = username.getText();
         
-        Authenticate(user, new String(pass));
+        authenticated = authenticate(user, pass);
         
         System.out.println(user);
-        System.out.println(new String(pass));
-        System.out.println("The user is a(n): " + usertype);
-        guiFrame.dispose();
+        System.out.println(pass);
+        
+        if (authenticated) {
+        	System.out.println("The user has been authenticated");
+        	System.out.println("The user is a(n): " + usertype);
+            guiFrame.dispose();
+            
+            createUserFrame();
+        }
+        else {
+        	count++;
+        	if(count != 5) {
+        		System.out.println("You have failed to authenticate");
+        		System.out.println("You have " + (5-count) + " trie(s) remaining, after that you will be locked out");
+        		guiFrame.dispose();
+        		createLoginFrame();
+        	}
+        	else {
+        		System.out.println("You have failed to authenticate 5 times, please contact the system admin for help, you will no longer be able to login from this IP");
+        		guiFrame.dispose();
+        	}
+        	
+        }
+    }
+    
+    private static void createUserFrame() throws FileNotFoundException, IOException {
+    	JFrame guiFrame = new JFrame();
+    	JButton newApp = new JButton("New Application");
+    	JButton viewApp = new JButton("View Current Application");
+    	JButton editApp = new JButton("Edit Application");
+    	JButton submitApp = new JButton("Submit Application");
+    	
+    	
+
+        
+    	ArrayList<Object> application = ApplicationDB.getApplicationbyName(user);
+    	
+    	System.out.println(application);
+    	
+    	if (application == null) {
+    		Container pane = guiFrame.getContentPane();
+    		pane.setLayout(new GridLayout(1,4));
+    		pane.add(newApp);
+    		pane.add(viewApp);
+    		pane.add(editApp);
+    		pane.add(submitApp);
+		
+    		guiFrame.setSize(1000, 100);
+    		//This will center the JFrame in the middle of the screen
+    		guiFrame.setLocationRelativeTo(null);
+    		guiFrame.setVisible(true);
+    	}
+    	else {
+    		Container pane = guiFrame.getContentPane();
+    		pane.setLayout(new GridLayout(1,4));
+    		pane.add(newApp);
+    		pane.add(viewApp);
+    		pane.add(editApp);
+    		pane.add(submitApp);
+		
+    		guiFrame.setSize(1000, 100);
+    		//This will center the JFrame in the middle of the screen
+    		guiFrame.setLocationRelativeTo(null);
+    		guiFrame.setVisible(true);
+    		newApp.setEnabled(false);
+    		if(!application.get(1).equals(ApplicationState.OPEN.toString())) {
+    			submitApp.setEnabled(false);
+    			editApp.setEnabled(false);
+    		}
+    	}
     }
 
-    private static void Authenticate(String username, String password) throws IOException {
+    private static boolean authenticate(String username, String password) throws IOException {
     	BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Users.txt")));
 
     	String line;
@@ -91,11 +165,10 @@ public class UI {
     			if(!pass.equals(password))
     				break;
     			usertype = line.substring(index, line.length());
-    			System.out.println("The user has been authenticated");
-    			return;
+    			return true;
     		}
     	}
-    	System.out.println("The user could not be authenticated");
+    	return false;
     }
 
 	public static void main(String[] args) {
@@ -103,6 +176,10 @@ public class UI {
 		login = new JButton("Login");
 		exit = new JButton("Exit");
 
+		//This will center the JFrame in the middle of the screen
+		frameCC.setLocationRelativeTo(null);
+		frameCC.setVisible(true);
+		
 		login.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
