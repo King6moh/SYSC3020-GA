@@ -122,7 +122,6 @@ public class UI {
         
         int input = JOptionPane.showConfirmDialog(appFrame, userPanel, "Fill out your application"
                 ,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        
         if (input == 0) {
         	String termSel = (String)termList.getSelectedItem();
         	String fieldSel = (String)fieldList.getSelectedItem();
