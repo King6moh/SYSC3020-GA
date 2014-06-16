@@ -18,6 +18,7 @@ public class UI {
 	static String fieldSel = FieldOfStudy.ARTS.toString();
 	static String fundingSel = "Yes";
 	static String userName = null;
+	static int count = 0;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -26,7 +27,6 @@ public class UI {
 	//all it's components
 	private static void createLoginFrame() throws IOException
 	{
-		int count = 0;
 		JFrame guiFrame = new JFrame();
 
 
@@ -98,7 +98,7 @@ public class UI {
 		JFrame appFrame = new JFrame("Select a Term");
 		
 		JPanel pane = new JPanel();
-		pane.setLayout(new GridLayout(3,2));
+		pane.setLayout(new GridLayout(1,2));
 
 		//This will center the JFrame in the middle of the screen
 		appFrame.setLocationRelativeTo(null);
@@ -124,6 +124,45 @@ public class UI {
 
 			System.out.println(termSel);
 			ArrayList<ArrayList> arr = ApplicationDB.getApplicationbyTerm(Term.valueOf(termSel));
+			System.out.println(arr);
+		}
+		else {
+			appFrame.dispose();
+			createUserFrame(usertype);
+		}
+		appFrame.dispose();
+	}
+	
+	private static void createProfessorfosViewFrame() throws FileNotFoundException, IOException {
+		JFrame appFrame = new JFrame("Select a Field Of Study");
+		
+		JPanel pane = new JPanel();
+		pane.setLayout(new GridLayout(1,2));
+
+		//This will center the JFrame in the middle of the screen
+		appFrame.setLocationRelativeTo(null);
+		appFrame.setVisible(true);
+
+		JLabel fosLabel = new JLabel("Select Field Of Study.");
+
+		String[] fields = { FieldOfStudy.ARTS.toString(), FieldOfStudy.COMMERCE.toString(), FieldOfStudy.ENGINEERING.toString(), FieldOfStudy.SCIENCE.toString() };
+		JComboBox<String> fieldList = new JComboBox<String>(fields);
+		fieldList.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				Object o = e.getSource();
+				fieldSel = (String) ((JComboBox) o).getSelectedItem();
+			}
+		});
+		pane.add(fosLabel);
+		pane.add(fieldList);
+		
+		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your application"
+				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (input == 0) {
+
+			System.out.println(fieldSel);
+			ArrayList<ArrayList> arr = ApplicationDB.getApplicationbyFieldOfStudy(FieldOfStudy.valueOf(fieldSel));
 			System.out.println(arr);
 		}
 		else {
@@ -283,7 +322,7 @@ public class UI {
 					}
 				}
 			});
-			/*viewByfos.addActionListener(new ActionListener() {
+			viewByfos.addActionListener(new ActionListener() {
 
 				public void actionPerformed(ActionEvent e) {
 					guiFrame.dispose();
@@ -297,7 +336,7 @@ public class UI {
 						e1.printStackTrace();
 					}
 				}
-			});*/
+			});
 			guiFrame.setSize(600, 150);
 			//This will center the JFrame in the middle of the screen
 			guiFrame.setLocationRelativeTo(null);

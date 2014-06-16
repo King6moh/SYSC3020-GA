@@ -74,7 +74,7 @@ public class ApplicationDB {
 					   for(int k = index; k < line.length(); k++) {
 						   if (line.charAt(k) == '$') {
 							   fosLocal = line.substring(index, k);
-							   System.out.println("termLocal: " + fosLocal);
+							   System.out.println("fieldLocal: " + fosLocal);
 							   index = k+1;
 							   break;
 						   }
@@ -271,7 +271,7 @@ public class ApplicationDB {
 		}
 		while ((line = br.readLine()) != null) {
 		   for(int i = 0; i < line.length(); i++) {
-			   if (i != digits) {
+			   if (i < digits) {
 				   if (line.charAt(i) != IDinBytes[i] && line.charAt(i) != '$') { // check if the id matches
 					   break;
 				   }
