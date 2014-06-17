@@ -25,7 +25,7 @@ public class MainTest {
 		
 		ArrayList<Object> storedApp = ApplicationDB.getApplicationbyID(1);
 		
-		assertTrue((int)application.get(0) == (int)storedApp.get(0));
+		assertTrue((Integer)application.get(0) == (Integer)storedApp.get(0));
 		assertTrue(((String)application.get(1)).equals((String)storedApp.get(1)));
 		//assertTrue(((String)application.get(2)).equals((String)storedApp.get(2)));
 		assertTrue(((String)application.get(3)).equals((String)storedApp.get(3)));
@@ -35,7 +35,7 @@ public class MainTest {
 		
 		storedApp = ApplicationDB.getApplicationbyName("Kais");
 		
-		assertTrue((int)application.get(0) == (int)storedApp.get(0));
+		assertTrue((Integer)application.get(0) == (Integer)storedApp.get(0));
 		assertTrue(((String)application.get(1)).equals((String)storedApp.get(1)));
 		//assertTrue(((String)application.get(2)).equals((String)storedApp.get(2)));
 		assertTrue(((String)application.get(3)).equals((String)storedApp.get(3)));
@@ -45,7 +45,7 @@ public class MainTest {
 		
 		ArrayList<ArrayList> stored = ApplicationDB.getApplicationbyFieldOfStudy(FieldOfStudy.ARTS);
 		
-		assertTrue((int)application.get(0) == (int)stored.get(0).get(0));
+		assertTrue((Integer)application.get(0) == (Integer)stored.get(0).get(0));
 		assertTrue(((String)application.get(1)).equals((String)stored.get(0).get(1)));
 		//assertTrue(((String)application.get(2)).equals((String)stored.get(0).get(2)));
 		assertTrue(((String)application.get(3)).equals((String)stored.get(0).get(3)));
@@ -55,7 +55,7 @@ public class MainTest {
 		
 		stored = ApplicationDB.getApplicationbyTerm(Term.FALL);
 		
-		assertTrue((int)application.get(0) == (int)stored.get(0).get(0));
+		assertTrue((Integer)application.get(0) == (Integer)stored.get(0).get(0));
 		assertTrue(((String)application.get(1)).equals((String)stored.get(0).get(1)));
 		//assertTrue(((String)application.get(2)).equals((String)stored.get(0).get(2)));
 		assertTrue(((String)application.get(3)).equals((String)stored.get(0).get(3)));
@@ -70,7 +70,7 @@ public class MainTest {
 		
 		storedApp = ApplicationDB.getApplicationbyID(1);
 		
-		assertTrue((int)application.get(0) == (int)storedApp.get(0));
+		assertTrue((Integer)application.get(0) == (Integer)storedApp.get(0));
 		assertTrue(((String)application.get(1)).equals((String)storedApp.get(1)));
 		//assertTrue(((String)application.get(2)).equals((String)storedApp.get(2)));
 		assertTrue(((String)application.get(3)).equals((String)storedApp.get(3)));

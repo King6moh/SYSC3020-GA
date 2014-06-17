@@ -177,7 +177,7 @@ public class UI {
 					e1.printStackTrace();
 				}
 				for(int i = 0; i < r.size(); i++) {
-					if((int)r.get(i).get(0) == IDget) {
+					if((Integer)r.get(i).get(0) == IDget) {
 						r.remove(i);
 					}
 				}
@@ -253,7 +253,7 @@ public class UI {
 		JLabel IDLabel = new JLabel("Select Application ID");
 
 		for(int i = 0; i < applications.size(); i++) {
-			ID[i] = (int)applications.get(i).get(0);
+			ID[i] = (Integer)applications.get(i).get(0);
 			IDs[i] = applications.get(i).get(0).toString();
 		}
 		IDSel = IDs[0];
@@ -570,8 +570,8 @@ public class UI {
 			application.set(4, termSel);
 			application.set(5, fieldSel);
 			application.set(6, (fundingSel.equals("Yes")) ? true : false);
-			System.out.println((int)application.get(0));
-			ApplicationDB.replacebyID((int)application.get(0), application);
+			System.out.println((Integer)application.get(0));
+			ApplicationDB.replacebyID((Integer)application.get(0), application);
 			appFrame.dispose();
 			createUserFrame(usertype);
 		}
@@ -728,7 +728,7 @@ public class UI {
 							guiFrame.dispose();
 							application.set(1, ApplicationState.SUBMITTED.toString());
 							try {
-								ApplicationDB.replacebyID((int)application.get(0), application);
+								ApplicationDB.replacebyID((Integer)application.get(0), application);
 							} catch (IOException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
