@@ -353,7 +353,13 @@ public class ApplicationDB {
 		br.close();
 		return null;
 	}
-	
+	/**
+	 * This method will replace the contents of the application with an updated application
+	 * 
+	 * @param ID the application ID of the application being replaced
+	 * @param application the new version of the application being replaced
+	 * @throws IOException
+	 */
 	public static void replacebyID(int ID, ArrayList<Object> application) throws IOException
 	{
 		int digits = 0;
@@ -411,7 +417,13 @@ public class ApplicationDB {
 		tempFile.delete();
 		System.out.println("done");
 	}
-	
+	/**
+	 * Transfers the contents of one file to another 
+	 * 
+	 * @param file1 source file
+	 * @param file2 destination file
+	 * @throws IOException
+	 */
 	private static void transferData(File file1, File file2) throws IOException {
 		String source = file1.getAbsolutePath();
 		String dest = file2.getAbsolutePath();
