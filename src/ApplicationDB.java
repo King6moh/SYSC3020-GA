@@ -77,7 +77,7 @@ public class ApplicationDB {
 					   for(int k = index; k < line.length(); k++) {
 						   if (line.charAt(k) == '$') {
 							   fosLocal = line.substring(index, k);
-							   System.out.println("termLocal: " + fosLocal);
+							   //System.out.println("fieldLocal: " + fosLocal);
 							   index = k+1;
 							   break;
 						   }
@@ -102,8 +102,8 @@ public class ApplicationDB {
 							   }
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
+								   offset = offset /10;
 							   }
-							   System.out.println(ID);
 							   arr.add(getApplicationbyID(ID));
 							  // System.out.println("line 77 break");
 							   break;
@@ -160,8 +160,8 @@ public class ApplicationDB {
 							   }
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
+								   offset = offset /10;
 							   }
-							   System.out.println(ID);
 							   arr = getApplicationbyID(ID);
 							  // System.out.println("line 77 break");
 							   return arr;
@@ -200,7 +200,7 @@ public class ApplicationDB {
 					   for(int k = index; k < line.length(); k++) {
 						   if (line.charAt(k) == '$') {
 							   termLocal = line.substring(index, k);
-							   System.out.println("termLocal: " + termLocal);
+							   //System.out.println("termLocal: " + termLocal);
 							   index = k+1;
 							   break;
 						   }
@@ -225,8 +225,9 @@ public class ApplicationDB {
 							   }
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
+								   offset = offset/10;
 							   }
-							   System.out.println(ID);
+							   System.out.println("Getting ID: " + ID);
 							   arr.add(getApplicationbyID(ID));
 							   //System.out.println("line 77 break");
 							   break;
@@ -264,6 +265,7 @@ public class ApplicationDB {
 		    number = number / 10;
 		    digits++;
 		}
+		System.out.println("digits: " + digits);
 		char IDinBytes[] = new char[digits];
 		number = ID;
 		int j = digits;
@@ -274,7 +276,7 @@ public class ApplicationDB {
 		}
 		while ((line = br.readLine()) != null) {
 		   for(int i = 0; i < line.length(); i++) {
-			   if (i != digits) {
+			   if (i < 1) {
 				   if (line.charAt(i) != IDinBytes[i] && line.charAt(i) != '$') { // check if the id matches
 					   break;
 				   }
@@ -285,6 +287,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get the application state
 					   if (line.charAt(k) == '$') {
 						   state = line.substring(index, k);
+						   //System.out.println("State: " + state);
 						   index = k+1;
 						   break;
 					   }
@@ -292,6 +295,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get the application date
 					   if (line.charAt(k) == '$') {
 						   date = line.substring(index, k);
+						   //System.out.println("Date: " + date);
 						   index = k+1;
 						   break;
 					   }
@@ -299,6 +303,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get the name of the applicant
 					   if (line.charAt(k) == '$') {
 						   name = line.substring(index, k);
+						   //System.out.println("Name: " + name);
 						   index = k+1;
 						   break;
 					   }
@@ -306,6 +311,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get the term for the application
 					   if (line.charAt(k) == '$') {
 						   term = line.substring(index, k);
+						   //System.out.println("Term: " + term);
 						   index = k+1;
 						   break;
 					   }
@@ -313,6 +319,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get the applicants field of study
 					   if (line.charAt(k) == '$') {
 						   fieldOfStudy = line.substring(index, k);
+						   //System.out.println("FieldOfStudy: " + fieldOfStudy);
 						   index = k+1;
 						   break;
 					   }
@@ -320,6 +327,7 @@ public class ApplicationDB {
 				   for(int k = index; k < line.length(); k++) { // get whether or not the applicant needs funding
 					   if (line.charAt(k) == '$') {
 						   fundingRequired = line.substring(index, k);
+						   //System.out.println("FundingRequired: " + fundingRequired);
 						   index = k+1;
 						   break;
 					   }

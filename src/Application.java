@@ -13,7 +13,7 @@ import java.util.*;
 public class Application {
 	private ArrayList<Object> application;
 	private int applicationID;
-	
+	private int bytesAvail;
 	public Application(String applicantName, Term term, FieldOfStudy fieldOfStudy, boolean fundingRequired) {
 		application = new ArrayList<Object>();
 		try {
@@ -55,6 +55,7 @@ public class Application {
 	private int readFromFile() throws FileNotFoundException, IOException {
 		BufferedInputStream in = new BufferedInputStream(new FileInputStream(System.getProperty("user.dir") + "\\Database\\LastID.txt"));
 		int availablebytes = in.available(); // check how big the value is
+		bytesAvail = availablebytes;
 		int offset = 1;
 		int result = 0;
 		for(int i=0; i < availablebytes-1; i++) {
@@ -76,7 +77,22 @@ public class Application {
 	private void writeToFile(int applicationID) throws FileNotFoundException, IOException {
 		FileOutputStream out = new FileOutputStream(System.getProperty("user.dir") + "\\Database\\LastID.txt");
 		// TODO make it write back the ID in a clean format
-		out.write(applicationID+49);
+		int offset = 1;
+		for(int i=0; i < bytesAvail-1; i++) {
+			offset = offset*10;
+		}
+		byte[] arr = new byte[bytesAvail];
+		for(int i=0; i < bytesAvail; i++) {
+			if (i == bytesAvail-1)
+				arr[(bytesAvail-1)-i] = (byte)((applicationID / offset)+49);
+			else
+				arr[(bytesAvail-1)-i] = (byte)((applicationID / offset)+48);
+			applicationID = applicationID % offset;
+			offset = offset/10;
+		}
+		for(int i=bytesAvail-1; i >= 0; i--) {
+			out.write(arr, 0, arr.length);
+		}
 		out.close();
 	}
 	/**
