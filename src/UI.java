@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * @author Kais
@@ -19,6 +21,8 @@ public class UI {
 	static String fundingSel = "Yes";
 	static String userName = null;
 	static int count = 0;
+	static String IDSel;
+	static String Items[];
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -94,8 +98,135 @@ public class UI {
 		}
 	}
 
-	private static void createProfessorTermViewFrame() throws FileNotFoundException, IOException {
-		JFrame appFrame = new JFrame("Select a Term");
+	private static void createTermAdminOfficeView(ArrayList<ArrayList> applications) throws FileNotFoundException, IOException {
+		JFrame appFrame = new JFrame();
+
+		String[] IDs = new String[applications.size()];
+		int[] ID = new int[applications.size()];
+		JPanel pane = new JPanel();
+		pane.setLayout(new GridLayout(1,3));
+		
+		JPanel pane2 = new JPanel();
+		pane2.setLayout(new GridLayout(6,2));
+
+
+		JLabel stateLabel = new JLabel("Application State");
+		JLabel dateLabel = new JLabel("Last Updated");
+		JLabel nameLabel = new JLabel("Applicant Name");
+		JLabel termLabel = new JLabel("Term selected");
+		JLabel fosLabel = new JLabel("Selected Field Of Study");
+		JLabel fundingLabel = new JLabel("Funding Required");
+
+		final JTextArea state = new JTextArea((String)applications.get(0).get(1));
+		final JTextArea date = new JTextArea((String)applications.get(0).get(2));
+		final JTextArea name = new JTextArea((String)applications.get(0).get(3));
+		final JTextArea term = new JTextArea((String)applications.get(0).get(4));
+		final JTextArea fos = new JTextArea((String)applications.get(0).get(5));
+		final JTextArea funding = new JTextArea(applications.get(0).get(6).equals("true") ? "Yes" : "No");
+
+		state.setEditable(false);
+		date.setEditable(false);
+		name.setEditable(false);
+		term.setEditable(false);
+		fos.setEditable(false);
+		funding.setEditable(false);
+
+		pane2.add(stateLabel);
+		pane2.add(state);
+		pane2.add(dateLabel);
+		pane2.add(date);
+		pane2.add(nameLabel);
+		pane2.add(name);
+		pane2.add(termLabel);
+		pane2.add(term);
+		pane2.add(fosLabel);
+		pane2.add(fos);
+		pane2.add(fundingLabel);
+		pane2.add(funding);
+		
+		//This will center the JFrame in the middle of the screen
+		appFrame.setLocationRelativeTo(null);
+		appFrame.setVisible(true);
+
+		JLabel IDLabel = new JLabel("Select Application ID");
+
+		for(int i = 0; i < applications.size(); i++) {
+			ID[i] = (int)applications.get(i).get(0);
+			IDs[i] = applications.get(i).get(0).toString();
+		}
+		IDSel = IDs[0];
+		Items = IDs;
+		JList<String> IDList = new JList<String>(Items);
+		IDList.addListSelectionListener(new ListSelectionListener() {
+			private boolean cooldown = false;
+			public void valueChanged(ListSelectionEvent e) {
+				if (!cooldown)
+			       {
+			           String sItems = "";
+			           JList list = (JList) e.getSource();
+			           int selected[] = list.getSelectedIndices();
+			           
+			           for(int i=0; i<selected.length; i++)
+			               sItems += Items[selected[i]] + ", ";
+			               
+			          //if (selected.length > 0)
+			               sItems = sItems.substring(0, sItems.length()-2);
+			               
+			          System.out.println(sItems + " selected in the JList.");
+			          int ID = Integer.parseInt(sItems);
+			          IDSel = sItems;
+			          ArrayList<Object> application = new ArrayList<Object>();
+					try {
+						application = ApplicationDB.getApplicationbyID(ID);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+			  		state.setText((String)application.get(1));
+			  		date.setText((String)application.get(2));
+			  		name.setText((String)application.get(3));
+			  		term.setText((String)application.get(4));
+			  		fos.setText((String)application.get(5));
+			  		funding.setText(application.get(6).equals("true") ? "Yes" : "No");
+			/*  		state.setEditable(false);
+			  		date.setEditable(false);
+			  		name.setEditable(false);
+			  		term.setEditable(false);
+			  		fos.setEditable(false);
+			  		funding.setEditable(false);*/
+
+			          cooldown = true;
+			       }
+			       else
+			          cooldown = false;
+			}
+		});
+		JScrollPane scroll = new JScrollPane(IDList);
+		pane.add(IDLabel);
+		pane.add(scroll);
+		pane.add(pane2);
+
+		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Application Selection"
+				,JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (input == 0) {
+			appFrame.dispose();
+			System.out.println(IDSel);
+			createUserFrame(usertype);
+		}
+		else {
+			appFrame.dispose();
+			createUserFrame(usertype);
+		}
+		appFrame.dispose();
+
+	}
+
+	private static void createAdminOfficeTermViewFrame() throws FileNotFoundException, IOException {
+		JFrame appFrame = new JFrame();
 
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(1,2));
@@ -124,7 +255,22 @@ public class UI {
 
 			System.out.println(termSel);
 			ArrayList<ArrayList> arr = ApplicationDB.getApplicationbyTerm(Term.valueOf(termSel));
-			System.out.println(arr);
+			//System.out.println(arr);
+			for(int i = 0; i < arr.size(); i++) {
+				if(arr.get(i).get(1).equals(ApplicationState.OPEN.toString())) {
+					arr.remove(i);
+					i--;
+				}
+			}
+			//System.out.println(arr);
+			appFrame.dispose();
+			if(arr.size() != 0) {
+				createTermAdminOfficeView(arr);
+			}
+			else {
+				// display something here
+			}
+				
 		}
 		else {
 			appFrame.dispose();
@@ -157,7 +303,7 @@ public class UI {
 		pane.add(fosLabel);
 		pane.add(fieldList);
 
-		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your application"
+		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Select a Term"
 				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (input == 0) {
 
@@ -173,7 +319,7 @@ public class UI {
 	}
 
 	private static void createApplicationFrame() throws FileNotFoundException, IOException {
-		JFrame appFrame = new JFrame("Fill out your new application");
+		JFrame appFrame = new JFrame();
 
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(3,2));
@@ -223,7 +369,7 @@ public class UI {
 		pane.add(fundingLabel);
 		pane.add(fundingList);
 
-		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your application"
+		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your new application"
 				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (input == 0) {
 
@@ -241,38 +387,113 @@ public class UI {
 		appFrame.dispose();
 
 	}
-	
+
+	private static void createEditFrame(ArrayList<Object> application) throws FileNotFoundException, IOException {
+		JFrame appFrame = new JFrame();
+		termSel = Term.FALL.toString();
+		fieldSel = FieldOfStudy.ARTS.toString();
+		fundingSel = "Yes";
+		JPanel pane = new JPanel();
+		pane.setLayout(new GridLayout(3,2));
+
+		//This will center the JFrame in the middle of the screen
+		appFrame.setLocationRelativeTo(null);
+		appFrame.setVisible(true);
+
+		JLabel termLabel = new JLabel("Select Term.");
+		JLabel fosLabel = new JLabel("Select Field Of Study.");
+		JLabel fundingLabel = new JLabel("Do you require Funding?");
+
+		String[] terms = { Term.FALL.toString(), Term.WINTER.toString(), Term.SUMMER.toString() };
+		JComboBox<String> termList = new JComboBox<String>(terms);
+		termList.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				Object o = e.getSource();
+				termSel = (String) ((JComboBox) o).getSelectedItem();
+			}
+		});
+
+		String[] fields = { FieldOfStudy.ARTS.toString(), FieldOfStudy.COMMERCE.toString(), FieldOfStudy.ENGINEERING.toString(), FieldOfStudy.SCIENCE.toString() };
+		JComboBox<String> fieldList = new JComboBox<String>(fields);
+		fieldList.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				Object o = e.getSource();
+				fieldSel = (String) ((JComboBox) o).getSelectedItem();
+			}
+		});
+
+		String[] fundings = { "Yes", "No" };
+		JComboBox<String> fundingList = new JComboBox<String>(fundings);
+		fundingList.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				Object o = e.getSource();
+				fundingSel = (String) ((JComboBox) o).getSelectedItem();
+			}
+		});
+
+		pane.add(termLabel);
+		pane.add(termList);
+		pane.add(fosLabel);
+		pane.add(fieldList);
+		pane.add(fundingLabel);
+		pane.add(fundingList);
+
+		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Edit your Application"
+				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		if (input == 0) {
+			System.out.println(termSel);
+			System.out.println(fieldSel);
+			System.out.println(fundingSel);
+			application.set(4, termSel);
+			application.set(5, fieldSel);
+			application.set(6, (fundingSel.equals("Yes")) ? true : false);
+			System.out.println((int)application.get(0));
+			ApplicationDB.replacebyID((int)application.get(0), application);
+			appFrame.dispose();
+			createUserFrame(usertype);
+		}
+		else {
+			appFrame.dispose();
+			createUserFrame(usertype);
+		}
+		appFrame.dispose();
+
+	}
+
 	private static void createViewFrame(ArrayList<Object> application) throws FileNotFoundException, IOException {
-		JFrame gFrame = new JFrame("Here is your current application");
-		
+		JFrame gFrame = new JFrame();
+
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(6,2));
 
 		//This will center the JFrame in the middle of the screen
 		gFrame.setLocationRelativeTo(null);
 		gFrame.setVisible(true);
-		
+
 		JLabel stateLabel = new JLabel("Application State");
 		JLabel dateLabel = new JLabel("Last Updated");
 		JLabel nameLabel = new JLabel("Applicant Name");
 		JLabel termLabel = new JLabel("Term selected");
 		JLabel fosLabel = new JLabel("Selected Field Of Study");
 		JLabel fundingLabel = new JLabel("Funding Required");
-		
+
 		JTextArea state = new JTextArea((String)application.get(1));
 		JTextArea date = new JTextArea((String)application.get(2));
 		JTextArea name = new JTextArea((String)application.get(3));
 		JTextArea term = new JTextArea((String)application.get(4));
 		JTextArea fos = new JTextArea((String)application.get(5));
 		JTextArea funding = new JTextArea(application.get(6).equals("true") ? "Yes" : "No");
-		
+
 		state.setEditable(false);
 		date.setEditable(false);
 		name.setEditable(false);
 		term.setEditable(false);
 		fos.setEditable(false);
 		funding.setEditable(false);
-		
+
 		pane.add(stateLabel);
 		pane.add(state);
 		pane.add(dateLabel);
@@ -285,16 +506,11 @@ public class UI {
 		pane.add(fos);
 		pane.add(fundingLabel);
 		pane.add(funding);
-		
-		int input = JOptionPane.showConfirmDialog(gFrame, pane, "Fill out your application"
-				,JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
-		if (input == 0) {
 
-			System.out.println(termSel);
-			System.out.println(fieldSel);
-			System.out.println(fundingSel);
-			new Application(userName, Term.valueOf(termSel), FieldOfStudy.valueOf(fieldSel), (fundingSel.equals("Yes")) ? true : false);
+		int input = JOptionPane.showConfirmDialog(gFrame, pane, "Application"
+				,JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+		if (input == 0) {
 			gFrame.dispose();
 			createUserFrame(usertype);
 		}
@@ -390,8 +606,15 @@ public class UI {
 
 						public void actionPerformed(ActionEvent e) {
 							guiFrame.dispose();
+							application.set(1, ApplicationState.SUBMITTED.toString());
 							try {
-								createApplicationFrame();
+								ApplicationDB.replacebyID((int)application.get(0), application);
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							try {
+								createUserFrame(usertype);
 							} catch (FileNotFoundException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -406,7 +629,7 @@ public class UI {
 						public void actionPerformed(ActionEvent e) {
 							guiFrame.dispose();
 							try {
-								createApplicationFrame();
+								createEditFrame(application);
 							} catch (FileNotFoundException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -420,6 +643,9 @@ public class UI {
 			}
 		}
 		else if (user.equals(Person.Professor.toString())) {
+
+		}
+		else if (user.equals(Person.AdminOffice.toString())) {
 			Container pane = guiFrame.getContentPane();
 			pane.setLayout(new GridLayout(1,2));
 			pane.add(viewByTerm);
@@ -429,7 +655,7 @@ public class UI {
 				public void actionPerformed(ActionEvent e) {
 					guiFrame.dispose();
 					try {
-						createProfessorTermViewFrame();
+						createAdminOfficeTermViewFrame();
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -458,9 +684,6 @@ public class UI {
 			//This will center the JFrame in the middle of the screen
 			guiFrame.setLocationRelativeTo(null);
 			guiFrame.setVisible(true);
-		}
-		else if (user.equals(Person.AdminOffice.toString())) {
-
 		}
 		else if (user.equals(Person.AssocChair.toString())) {
 

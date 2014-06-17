@@ -354,7 +354,7 @@ public class ApplicationDB {
 		return null;
 	}
 	
-	private static void replacebyID(int ID, ArrayList<Object> application) throws IOException
+	public static void replacebyID(int ID, ArrayList<Object> application) throws IOException
 	{
 		int digits = 0;
 		int number = ID;
