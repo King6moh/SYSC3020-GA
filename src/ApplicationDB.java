@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -358,6 +359,7 @@ public class ApplicationDB {
 		int digits = 0;
 		int number = ID;
 		File tempFile = new File((System.getProperty("user.dir") + "\\Database\\TEMPApplications.txt"));
+		File file = new File((System.getProperty("user.dir") + "\\Database\\Applications.txt"));
 		BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Applications.txt")));
 		FileOutputStream writer = new FileOutputStream(((System.getProperty("user.dir") + "\\Database\\TEMPApplications.txt")));
 		String line;
@@ -403,7 +405,38 @@ public class ApplicationDB {
 			   }
 		   }
 		}
+		writer.close();
+		br.close();
+		transferData(tempFile, file);
+		tempFile.delete();
 		System.out.println("done");
+	}
+	
+	private static void transferData(File file1, File file2) throws IOException {
+		File dir = new File(".");
+		 
+		String source = file1.getAbsolutePath();
+		String dest = file2.getAbsolutePath();
+ 
+		File fin = new File(source);
+		FileInputStream fis = new FileInputStream(fin);
+		BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+ 
+		FileWriter fstream = new FileWriter(dest, false);
+		BufferedWriter out = new BufferedWriter(fstream);
+ 
+		String aLine = null;
+		while ((aLine = in.readLine()) != null) {
+			//Process each line and add output to Dest.txt file
+			out.write(aLine);
+			out.newLine();
+		}
+ 
+		// do not forget to close the buffer reader
+		in.close();
+ 
+		// close buffer writer
+		out.close();
 	}
 	
 	/**
