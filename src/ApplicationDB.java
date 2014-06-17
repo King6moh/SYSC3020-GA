@@ -227,7 +227,7 @@ public class ApplicationDB {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
 								   offset = offset/10;
 							   }
-							   System.out.println("Getting ID: " + ID);
+							   //System.out.println("Getting ID: " + ID);
 							   arr.add(getApplicationbyID(ID));
 							   //System.out.println("line 77 break");
 							   break;
@@ -265,7 +265,7 @@ public class ApplicationDB {
 		    number = number / 10;
 		    digits++;
 		}
-		System.out.println("digits: " + digits);
+		//System.out.println("digits: " + digits);
 		char IDinBytes[] = new char[digits];
 		number = ID;
 		int j = digits;
@@ -276,10 +276,13 @@ public class ApplicationDB {
 		}
 		while ((line = br.readLine()) != null) {
 		   for(int i = 0; i < line.length(); i++) {
-			   if (i < 1) {
+			   if (i < digits) {
 				   if (line.charAt(i) != IDinBytes[i] && line.charAt(i) != '$') { // check if the id matches
 					   break;
 				   }
+			   }
+			   else if (line.charAt(i) != '$' && i >= digits) {
+				   break;
 			   }
 			   else if (line.charAt(i) == '$') {
 				   applicationID = ID;
@@ -402,6 +405,7 @@ public class ApplicationDB {
 		app = new Application("SamsonTruong", Term.WINTER, FieldOfStudy.SCIENCE, true);
 		/* Check the Applications file in the Database, and you'll see which ones should be printed here */
 		ArrayList<ArrayList> array = new ArrayList<ArrayList>();
+		ArrayList<Object> arr = new ArrayList<Object>();
 		try {
 			array = getApplicationbyFieldOfStudy(FieldOfStudy.ENGINEERING);
 		} catch (FileNotFoundException e) {
@@ -409,7 +413,7 @@ public class ApplicationDB {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.print(array);
+		System.out.print(array + "\n");
 		try {
 			array = getApplicationbyTerm(Term.WINTER);
 		} catch (FileNotFoundException e) {
@@ -417,6 +421,17 @@ public class ApplicationDB {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.print(array+ "\n");
+		try {
+			arr = getApplicationbyID(4);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(arr);
 		System.out.print(array);
 		
 		try {
