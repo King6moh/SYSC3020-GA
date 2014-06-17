@@ -99,8 +99,8 @@ public class ApplicationDB {
 							   }
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
+								   offset = offset /10;
 							   }
-							   System.out.println(ID);
 							   arr.add(getApplicationbyID(ID));
 							  // System.out.println("line 77 break");
 							   break;
@@ -157,8 +157,8 @@ public class ApplicationDB {
 							   }
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
+								   offset = offset /10;
 							   }
-							   System.out.println(ID);
 							   arr = getApplicationbyID(ID);
 							  // System.out.println("line 77 break");
 							   return arr;
@@ -223,7 +223,7 @@ public class ApplicationDB {
 							   for(int k = 0; k < appID.length(); k++) {
 								   ID = ID + ((appID.charAt(k)-48)*offset);
 							   }
-							   System.out.println(ID);
+							   System.out.println("Getting ID: " + ID);
 							   arr.add(getApplicationbyID(ID));
 							   //System.out.println("line 77 break");
 							   break;
