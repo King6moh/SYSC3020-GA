@@ -1,9 +1,12 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -338,6 +341,50 @@ public class ApplicationDB {
 		br.close();
 		return null;
 	}
+	
+	private static void replacebyID(int ID, ArrayList<Object> application) throws IOException
+	{
+		int digits = 0;
+		int number = ID;
+		File tempFile = new File((System.getProperty("user.dir") + "\\Database\\TEMPApplications.txt"));
+		BufferedReader br = new BufferedReader(new FileReader((System.getProperty("user.dir") + "\\Database\\Applications.txt")));
+		BufferedWriter writer = new BufferedWriter(new FileWriter((System.getProperty("user.dir") + "\\Database\\TEMPApplications.txt")));
+		String line;
+		
+		while (number > 0) {
+		    number = number / 10;
+		    digits++;
+		}
+		char IDinBytes[] = new char[digits];
+		number = ID;
+		int j = digits;
+		while (number > 0) {
+			IDinBytes[j-1] = (char)((number % 10)+48);
+		    number = number / 10;
+		    j--;
+		}
+		while ((line = br.readLine()) != null) {
+		   for(int i = 0; i < line.length(); i++) {
+			   if (i != digits) {
+				   if (line.charAt(i) != IDinBytes[i] && line.charAt(i) != '$') { // check if the id matches
+					   System.out.println("not right line" + i);
+					   writer.write(line);
+					   System.out.println(line);
+					   break;
+				   }
+			   }
+			   else if (line.charAt(i) == '$') {	//Line found
+				   System.out.println("right line");
+				   String data = new String( ID + "$" +  application.get(1) + "$" + application.get(2) + "$" + application.get(3) + "$" + application.get(4) + "$" + application.get(5) + "$" + application.get(6)+ "$\n");
+				   writer.write(data);
+				   System.out.println(data);
+				   break;
+			   }
+		   }
+		}
+		System.out.println("done");
+	}
+	
 	/**
 	 * The following main is just to show that our methods defined above work. Everytime it is run, it will append 2 applications to the database
 	 * @param args
@@ -363,5 +410,15 @@ public class ApplicationDB {
 			e.printStackTrace();
 		}
 		System.out.print(array);
+		
+		try {
+			replacebyID(2, getApplicationbyID(1));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
