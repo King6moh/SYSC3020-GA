@@ -23,6 +23,9 @@ public class UI {
 	static int count = 0;
 	static String IDSel;
 	static String Items[];
+	static int IDget;
+	static ArrayList<ArrayList> r;
+	static boolean showAgain = true;
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -98,17 +101,116 @@ public class UI {
 		}
 	}
 
-	private static void createTermAdminOfficeView(ArrayList<ArrayList> applications) throws FileNotFoundException, IOException {
-		JFrame appFrame = new JFrame();
-
+	private static void createAdminOfficeView(ArrayList<ArrayList> applications) throws FileNotFoundException, IOException {
+		final JFrame appFrame = new JFrame();
+		r = applications;
+		
+		//showAgain = true;
+		
 		String[] IDs = new String[applications.size()];
 		int[] ID = new int[applications.size()];
 		JPanel pane = new JPanel();
-		pane.setLayout(new GridLayout(1,3));
+		pane.setLayout(new GridLayout(1,4));
 		
 		JPanel pane2 = new JPanel();
 		pane2.setLayout(new GridLayout(6,2));
+		
+		JPanel pane3 = new JPanel();
+		pane3.setLayout(new GridLayout(2,1));
+		
+		final JButton validate = new JButton("Validate");
+		final JButton incomplete = new JButton("Incomplete");
+		
+		validate.addActionListener(new ActionListener() {
 
+			public void actionPerformed(ActionEvent e) {
+				showAgain = false;
+				appFrame.dispose();
+				ArrayList<Object> arr = new ArrayList<Object>();
+				try {
+					arr = ApplicationDB.getApplicationbyID(IDget);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				arr.set(1, ApplicationState.ADMINREVIEWED.toString());
+				try {
+					ApplicationDB.replacebyID(IDget, arr);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					createAdminOfficeView(r);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		incomplete.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				showAgain = false;
+				appFrame.dispose();
+				ArrayList<Object> arr = new ArrayList<Object>();
+				try {
+					arr = ApplicationDB.getApplicationbyID(IDget);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				arr.set(1, ApplicationState.OPEN.toString());
+				try {
+					ApplicationDB.replacebyID(IDget, arr);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				for(int i = 0; i < r.size(); i++) {
+					if((int)r.get(i).get(0) == IDget) {
+						r.remove(i);
+					}
+				}
+				if (r.size() == 0) {
+					System.out.println("No applications available");
+					try {
+						createUserFrame(usertype);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				else {
+				try {
+					createAdminOfficeView(r);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				}
+			}
+		});
+		
+		validate.setEnabled(false);
+		incomplete.setEnabled(false);
+		pane3.add(validate);
+		pane3.add(incomplete);
 
 		JLabel stateLabel = new JLabel("Application State");
 		JLabel dateLabel = new JLabel("Last Updated");
@@ -173,11 +275,11 @@ public class UI {
 			               sItems = sItems.substring(0, sItems.length()-2);
 			               
 			          System.out.println(sItems + " selected in the JList.");
-			          int ID = Integer.parseInt(sItems);
+			          IDget = Integer.parseInt(sItems);
 			          IDSel = sItems;
 			          ArrayList<Object> application = new ArrayList<Object>();
 					try {
-						application = ApplicationDB.getApplicationbyID(ID);
+						application = ApplicationDB.getApplicationbyID(IDget);
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -185,19 +287,20 @@ public class UI {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-
+					if(!application.get(1).toString().equals(ApplicationState.SUBMITTED.toString())) {
+						validate.setEnabled(false);
+						incomplete.setEnabled(false);
+					}
+					else {
+						validate.setEnabled(true);
+						incomplete.setEnabled(true);
+					}
 			  		state.setText((String)application.get(1));
 			  		date.setText((String)application.get(2));
 			  		name.setText((String)application.get(3));
 			  		term.setText((String)application.get(4));
 			  		fos.setText((String)application.get(5));
 			  		funding.setText(application.get(6).equals("true") ? "Yes" : "No");
-			/*  		state.setEditable(false);
-			  		date.setEditable(false);
-			  		name.setEditable(false);
-			  		term.setEditable(false);
-			  		fos.setEditable(false);
-			  		funding.setEditable(false);*/
 
 			          cooldown = true;
 			       }
@@ -209,6 +312,7 @@ public class UI {
 		pane.add(IDLabel);
 		pane.add(scroll);
 		pane.add(pane2);
+		pane.add(pane3);
 
 		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Application Selection"
 				,JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -219,7 +323,8 @@ public class UI {
 		}
 		else {
 			appFrame.dispose();
-			createUserFrame(usertype);
+			if(showAgain)
+				createUserFrame(usertype);
 		}
 		appFrame.dispose();
 
@@ -227,7 +332,7 @@ public class UI {
 
 	private static void createAdminOfficeTermViewFrame() throws FileNotFoundException, IOException {
 		JFrame appFrame = new JFrame();
-
+		termSel = Term.FALL.toString();
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(1,2));
 
@@ -265,10 +370,11 @@ public class UI {
 			//System.out.println(arr);
 			appFrame.dispose();
 			if(arr.size() != 0) {
-				createTermAdminOfficeView(arr);
+				createAdminOfficeView(arr);
 			}
 			else {
-				// display something here
+				System.out.println("No applications available");
+				createUserFrame(usertype);
 			}
 				
 		}
@@ -279,9 +385,9 @@ public class UI {
 		appFrame.dispose();
 	}
 
-	private static void createProfessorfosViewFrame() throws FileNotFoundException, IOException {
+	private static void createAdminOfficefosViewFrame() throws FileNotFoundException, IOException {
 		JFrame appFrame = new JFrame("Select a Field Of Study");
-
+		termSel = Term.FALL.toString();
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(1,2));
 
@@ -310,6 +416,20 @@ public class UI {
 			System.out.println(fieldSel);
 			ArrayList<ArrayList> arr = ApplicationDB.getApplicationbyFieldOfStudy(FieldOfStudy.valueOf(fieldSel));
 			System.out.println(arr);
+			
+			for(int i = 0; i < arr.size(); i++) {
+				if(arr.get(i).get(1).equals(ApplicationState.OPEN.toString())) {
+					arr.remove(i);
+					i--;
+				}
+			}
+			if(arr.size() != 0) {
+				createAdminOfficeView(arr);
+			}
+			else {
+				System.out.println("No applications available");
+				createUserFrame(usertype);
+			}
 		}
 		else {
 			appFrame.dispose();
@@ -670,7 +790,7 @@ public class UI {
 				public void actionPerformed(ActionEvent e) {
 					guiFrame.dispose();
 					try {
-						createProfessorfosViewFrame();
+						createAdminOfficefosViewFrame();
 					} catch (FileNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
