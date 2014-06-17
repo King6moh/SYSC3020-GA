@@ -887,7 +887,6 @@ public class UI {
 
 	public static void main(String[] args) {
 		createCCFrame();
-		//NotesGui gui = new NotesGui();
 	}
 
 }

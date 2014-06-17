@@ -413,8 +413,6 @@ public class ApplicationDB {
 	}
 	
 	private static void transferData(File file1, File file2) throws IOException {
-		File dir = new File(".");
-		 
 		String source = file1.getAbsolutePath();
 		String dest = file2.getAbsolutePath();
  
