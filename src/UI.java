@@ -93,10 +93,10 @@ public class UI {
 
 		}
 	}
-	
+
 	private static void createProfessorTermViewFrame() throws FileNotFoundException, IOException {
 		JFrame appFrame = new JFrame("Select a Term");
-		
+
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(1,2));
 
@@ -117,7 +117,7 @@ public class UI {
 		});
 		pane.add(termLabel);
 		pane.add(termList);
-		
+
 		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your application"
 				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (input == 0) {
@@ -132,10 +132,10 @@ public class UI {
 		}
 		appFrame.dispose();
 	}
-	
+
 	private static void createProfessorfosViewFrame() throws FileNotFoundException, IOException {
 		JFrame appFrame = new JFrame("Select a Field Of Study");
-		
+
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(1,2));
 
@@ -156,7 +156,7 @@ public class UI {
 		});
 		pane.add(fosLabel);
 		pane.add(fieldList);
-		
+
 		int input = JOptionPane.showConfirmDialog(appFrame, pane, "Fill out your application"
 				,JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (input == 0) {
@@ -230,6 +230,9 @@ public class UI {
 			System.out.println(termSel);
 			System.out.println(fieldSel);
 			System.out.println(fundingSel);
+			new Application(userName, Term.valueOf(termSel), FieldOfStudy.valueOf(fieldSel), (fundingSel.equals("Yes")) ? true : false);
+			appFrame.dispose();
+			createUserFrame(usertype);
 		}
 		else {
 			appFrame.dispose();
@@ -237,6 +240,69 @@ public class UI {
 		}
 		appFrame.dispose();
 
+	}
+	
+	private static void createViewFrame(ArrayList<Object> application) throws FileNotFoundException, IOException {
+		JFrame gFrame = new JFrame("Here is your current application");
+		
+		JPanel pane = new JPanel();
+		pane.setLayout(new GridLayout(6,2));
+
+		//This will center the JFrame in the middle of the screen
+		gFrame.setLocationRelativeTo(null);
+		gFrame.setVisible(true);
+		
+		JLabel stateLabel = new JLabel("Application State");
+		JLabel dateLabel = new JLabel("Last Updated");
+		JLabel nameLabel = new JLabel("Applicant Name");
+		JLabel termLabel = new JLabel("Term selected");
+		JLabel fosLabel = new JLabel("Selected Field Of Study");
+		JLabel fundingLabel = new JLabel("Funding Required");
+		
+		JTextArea state = new JTextArea((String)application.get(1));
+		JTextArea date = new JTextArea((String)application.get(2));
+		JTextArea name = new JTextArea((String)application.get(3));
+		JTextArea term = new JTextArea((String)application.get(4));
+		JTextArea fos = new JTextArea((String)application.get(5));
+		JTextArea funding = new JTextArea(application.get(6).equals("true") ? "Yes" : "No");
+		
+		state.setEditable(false);
+		date.setEditable(false);
+		name.setEditable(false);
+		term.setEditable(false);
+		fos.setEditable(false);
+		funding.setEditable(false);
+		
+		pane.add(stateLabel);
+		pane.add(state);
+		pane.add(dateLabel);
+		pane.add(date);
+		pane.add(nameLabel);
+		pane.add(name);
+		pane.add(termLabel);
+		pane.add(term);
+		pane.add(fosLabel);
+		pane.add(fos);
+		pane.add(fundingLabel);
+		pane.add(funding);
+		
+		int input = JOptionPane.showConfirmDialog(gFrame, pane, "Fill out your application"
+				,JOptionPane.CLOSED_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (input == 0) {
+
+			System.out.println(termSel);
+			System.out.println(fieldSel);
+			System.out.println(fundingSel);
+			new Application(userName, Term.valueOf(termSel), FieldOfStudy.valueOf(fieldSel), (fundingSel.equals("Yes")) ? true : false);
+			gFrame.dispose();
+			createUserFrame(usertype);
+		}
+		else {
+			gFrame.dispose();
+			createUserFrame(usertype);
+		}
+		gFrame.dispose();
 	}
 
 	private static void createUserFrame(String user) throws FileNotFoundException, IOException {
@@ -249,7 +315,7 @@ public class UI {
 		JButton viewByfos = new JButton("View Applications for a Field Of Study");
 
 		if (user.equals(Person.Applicant.toString())) {
-			ArrayList<Object> application = ApplicationDB.getApplicationbyName(userName);
+			final ArrayList<Object> application = ApplicationDB.getApplicationbyName(userName);
 			System.out.println(application);
 			if (application == null) {
 				Container pane = guiFrame.getContentPane();
@@ -284,6 +350,7 @@ public class UI {
 
 			}
 			else {
+				System.out.println("In else");
 				Container pane = guiFrame.getContentPane();
 				pane.setLayout(new GridLayout(1,4));
 				pane.add(newApp);
@@ -296,9 +363,59 @@ public class UI {
 				guiFrame.setLocationRelativeTo(null);
 				guiFrame.setVisible(true);
 				newApp.setEnabled(false);
+				viewApp.setEnabled(true);
+				viewApp.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						guiFrame.dispose();
+						try {
+							createViewFrame(application);
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				});
 				if(!application.get(1).equals(ApplicationState.OPEN.toString())) {
 					submitApp.setEnabled(false);
 					editApp.setEnabled(false);
+				}
+				else {
+					submitApp.setEnabled(true);
+					editApp.setEnabled(true);
+					submitApp.addActionListener(new ActionListener() {
+
+						public void actionPerformed(ActionEvent e) {
+							guiFrame.dispose();
+							try {
+								createApplicationFrame();
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}
+					});
+					editApp.addActionListener(new ActionListener() {
+
+						public void actionPerformed(ActionEvent e) {
+							guiFrame.dispose();
+							try {
+								createApplicationFrame();
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+						}
+					});
 				}
 			}
 		}
@@ -343,10 +460,10 @@ public class UI {
 			guiFrame.setVisible(true);
 		}
 		else if (user.equals(Person.AdminOffice.toString())) {
-			
+
 		}
 		else if (user.equals(Person.AssocChair.toString())) {
-			
+
 		}
 	}
 
